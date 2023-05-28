@@ -199,6 +199,108 @@ app.post('/login', (req, res) => {
         })
 })
 
+//ruta para obtener documentos en DB
+app.get('/traertodo', async(req, res) => {
+    const usuarios = collection(bd, "usuarios")
+    const arreglo = await getDocs(usuarios)
+    let returnData = []
+    arreglo.forEach(usuario => {
+        returnData.push(usuario.data())
+    })
+    res.json({
+        'alert': 'success',
+        'data': returnData
+    })
+})
+
+//ruta para obtener documentos en DB de Ventas
+app.get('/traerventas', async(req, res) => {
+    const ventas = collection(bd, "ventas")
+    const arreglo = await getDocs(ventas)
+    let returnData = []
+    arreglo.forEach(venta => {
+        returnData.push(venta.data())
+    })
+    res.json({
+        'alert': 'success',
+        'data': returnData
+    })
+})
+
+//ruta eliminar
+app.post('/eliminar', (req, res) => {
+    const { email } = req.body
+        //const refer = bd.collection('alumnos').doc()
+        //let alumnoBorrado = bd.collection('alumnos').where('email', '==', email)
+    let usuarioBorrado = doc(bd, 'usuarios', email)
+    deleteDoc(usuarioBorrado)
+        .then((result) => {
+            res.json({
+                'alert': 'user deleted'
+            })
+        })
+        .catch((error) => {
+            res.json({
+                'alert': 'error'
+            })
+        })
+})
+
+//ruta actualizar
+app.post('/actualizar', (req, res) => {
+    const { name, email, lastname, number } = req.body
+
+    if (name.length < 3) {
+        res.json({
+            'alert': 'El nombre requiere minimo 3 caracteres'
+        })
+    } else if (lastname.length < 3) {
+        res.json({
+            'alert': 'El apellido requiere minimo 3 caracteres'
+        })
+    } else if (!email.length) {
+        res.json({
+            'alert': 'Debes de ingresar un correo electronico'
+        })
+    } else if (!Number(number) || !number.length === 10) {
+        res.json({
+            'alert': 'Introduce un numero valido    '
+        })
+    } else {
+        //Obtener el doc del usuario
+        //bd.collection('alumnos'.doc(id))
+        const dataUpdate = {
+            name,
+            lastname,
+            number
+        }
+        updateDoc(doc(bd, "usuarios", email), dataUpdate)
+            .then((response) => {
+                res.json({
+                    'alert': 'success'
+                })
+            }).catch((error) => {
+                res.json({
+                    'alert': 'error'
+                })
+            })
+            //updateDoc(doc(bd),"alumnos",{name, lastname, number},email)
+    }
+})
+
+app.get('/traermodelos', async(req, res) => {
+    const modelos = collection(bd, "modelos")
+    const arreglo = await getDocs(modelos)
+    let returnData = []
+    arreglo.forEach(modelo => {
+        returnData.push(modelo.data())
+    })
+    res.json({
+        'alert': 'success',
+        'data': returnData
+    })
+})
+
 
 
 

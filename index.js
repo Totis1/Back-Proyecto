@@ -4,7 +4,7 @@ const cors = require('cors')
 const multer = require('multer')
 const { initializeApp } = require('firebase/app')
 const { getFirestore, collection, getDoc, doc, getDocs, setDoc, updateDoc, deleteDoc} = require('firebase/firestore')
-const {getStorage, ref, getDownloadURL, uploadBytes } = require('firebase/storage')
+const {getStorage, ref, getDownloadURL, uploadBytes, deleteObject } = require('firebase/storage')
 
 require('dotenv/config')
 
@@ -246,6 +246,44 @@ app.post('/eliminar', (req, res) => {
         })
 })
 
+//ruta eliminar venta
+app.post('/eliminarventa', (req, res) => {
+    const { Nombre } = req.body
+        //const refer = bd.collection('alumnos').doc()
+        //let alumnoBorrado = bd.collection('alumnos').where('email', '==', email)
+    let ventaBorrado = doc(bd, 'ventas', Nombre)
+    deleteDoc(ventaBorrado)
+        .then((result) => {
+            res.json({
+                'alert': 'user deleted'
+            })
+        })
+        .catch((error) => {
+            res.json({
+                'alert': 'error'
+            })
+        })
+})
+
+//ruta eliminar modelo
+app.post('/eliminarmodelo', (req, res) => {
+    const { id_Modelo } = req.body
+        //const refer = bd.collection('alumnos').doc()
+        //let alumnoBorrado = bd.collection('alumnos').where('email', '==', email)
+    let modeloBorrado = doc(bd, 'modelos', id_Modelo)
+    deleteDoc(modeloBorrado)
+        .then((result) => {
+            res.json({
+                'alert': 'user deleted'
+            })
+        })
+        .catch((error) => {
+            res.json({
+                'alert': 'error'
+            })
+        })
+})
+
 //ruta actualizar
 app.post('/actualizar', (req, res) => {
     const { name, email, lastname, number } = req.body
@@ -275,6 +313,52 @@ app.post('/actualizar', (req, res) => {
             number
         }
         updateDoc(doc(bd, "usuarios", email), dataUpdate)
+            .then((response) => {
+                res.json({
+                    'alert': 'success'
+                })
+            }).catch((error) => {
+                res.json({
+                    'alert': 'error'
+                })
+            })
+            //updateDoc(doc(bd),"alumnos",{name, lastname, number},email)
+    }
+})
+
+//ruta actualizar una venta
+app.post('/actualizarventa', (req, res) => {
+    const {Numero, Nombre, Categoria, Modelo, NombreM, GrModelo, TiempoImp, Tmaterial, Seguro, Insumos, Ptotal, Fecha} = req.body
+
+    if (Nombre.length < 3) {
+        res.json({
+            'alert': 'El nombre requiere minimo 3 caracteres'
+        })
+    } else if (Categoria.length < 3) {
+        res.json({
+            'alert': 'El apellido requiere minimo 3 caracteres'
+        })
+    } else if (!Modelo.length) {
+        res.json({
+            'alert': 'Debes de ingresar un correo electronico'
+        })
+    } else {
+        //Obtener el doc de la venta
+        //bd.collection('ventas'.doc(id))
+        const dataUpdate2 = {
+            Numero,
+            Categoria,
+            Modelo,
+            NombreM,
+            GrModelo,
+            TiempoImp,
+            Tmaterial,
+            Seguro,
+            Insumos,
+            Ptotal,
+            Fecha
+        }
+        updateDoc(doc(bd, "ventas", Nombre), dataUpdate2)
             .then((response) => {
                 res.json({
                     'alert': 'success'
@@ -340,8 +424,22 @@ app.post('/insertarimgmodelo', upload.single('Imagen'), (req, res) => {
     
 })
 
+app.post('/borrarimagenmodelo', (req, res) => {
+    const {id_modelo} = req.body
+    console.log(id_modelo)
+    deleteObject(id_modelo).then(() => {
+        res.json({
+            'alert': 'success, deleted imagen'
+        })
+    }).catch(error => {
+        res.json({
+            'alert': error
+        })
+    })
+})
 
-//const PORT = 5000
+
+const PORT = 5000
 
 app.listen(PORT, () => {
     console.log(`Escuchando en el Puerto: ${PORT}`)

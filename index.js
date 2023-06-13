@@ -325,7 +325,20 @@ app.post('/insertarmodelo', (req, res) => {
 
 })
 
-
+app.post('/insertarimgmodelo', upload.single('Imagen'), (req, res) => {
+    const imagen = req.file;
+    const imagesRef = ref(storageRef,'imagenes/'+imagen.originalname);
+    const metadata = {
+        contentType: 'image/jpeg'
+    }
+    uploadBytes(imagesRef, imagen.buffer, metadata).then((snapshot) => {
+        getDownloadURL(imagesRef)
+        .then((url) => {
+            res.status(200).json({ message: 'Imagen subida correctamente.', imageUrl: url });
+          })
+    }).catch(err => {console.error(err)});
+    
+})
 
 
 const PORT = process.env.PORT || 12000

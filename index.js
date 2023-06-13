@@ -301,6 +301,30 @@ app.get('/traermodelos', async(req, res) => {
     })
 })
 
+//ruta subir imagenes
+app.post('/insertarmodelo', (req, res) => {
+    const {id_Modelo, Nombre, Categoria, GrModelo, TiempoImp, Imagen} = req.body
+    const modelos = collection(bd, "modelos")
+    sendData = {
+        id_Modelo,
+        Nombre,
+        Categoria,
+        GrModelo,
+        TiempoImp,
+        Imagen
+    }
+    setDoc(doc(modelos, id_Modelo), sendData).then(() => {
+        res.json({
+            'alert': 'success'
+        })
+    }).catch(error => {
+        res.json({
+            'alert': error
+        })
+    })
+
+})
+
 
 
 
